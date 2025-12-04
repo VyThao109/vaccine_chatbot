@@ -5,6 +5,7 @@ import SignInPage from "../pages/auth/SignInPage";
 import SignUpPage from "../pages/auth/SignUpPage";
 import NotFoundPage from "../pages/error/NotFoundPage";
 import ProtectedRoute from "../guards/ProtectedRoute";
+import ChatPage from "../pages/chat/ChatPage";
 
 const AppRoutes = () => {
   return (
@@ -12,6 +13,7 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route path={paths.root} element={<MainLayout />}>
           <Route index element={<Navigate to={paths.chat} replace />} />
+          <Route path={paths.chat} element={<ChatPage />} />
         </Route>
       </Route>
       <Route path={paths.signin} element={<SignInPage />} />

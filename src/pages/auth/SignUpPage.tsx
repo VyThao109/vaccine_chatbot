@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import AuthFormLayout from "../../compent/auth/AuthFormLayout";
+import AuthFormLayout from "../../components/auth/AuthFormLayout";
 import { paths } from "../../routes/paths";
 import { useState } from "react";
-import AuthInput from "../../compent/auth/AuthInput";
+import AuthInput from "../../components/auth/AuthInput";
 import { LuLock, LuMail, LuUser } from "react-icons/lu";
-import PromoteSide from "../../compent/auth/PromoteSide";
+import PromoteSide from "../../components/auth/PromoteSide";
+import { useAppDispatch } from "../../redux/hook";
+import { useRegisterMutation } from "../../redux/services/auth/auth.service";
+import { setCredentials } from "../../redux/features/auth/auth.slice";
 
 interface FormData {
   fullName: string;
@@ -24,6 +27,8 @@ interface FormErrors {
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [register, { isLoading }] = useRegisterMutation();
 
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
@@ -76,10 +81,32 @@ const SignUpPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    setErrors({});
     if (validateForm()) {
-      navigate(paths.signin);
+      try {
+        const response = await register({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+        }).unwrap();
+
+        if (response.statusCode === 200) {
+          dispatch(
+            setCredentials({
+              accessToken: response.data.token,
+            })
+          );
+          navigate(paths.chat);
+        } else {
+          alert(response.message || "Đăng ký thất bại");
+        }
+      } catch (err: any) {
+        console.error("Register failed:", err);
+        const errorMsg = err?.data?.message || "Có lỗi xảy ra";
+        alert(errorMsg);
+      }
     }
   };
 
@@ -92,7 +119,7 @@ const SignUpPage = () => {
       <AuthFormLayout
         title={"Tạo Tài Khoản"}
         subtitle={"Đăng ký để trải nghiệm dịch vụ tư vấn vaccine"}
-        submitText="Đăng ký"
+        submitText={isLoading ? "Đang xử lý..." : "Đăng ký"}
         onSubmit={handleSubmit}
         footerText={"Đã có tài khoản"}
         footerLinkText={"Đăng nhập ngay"}
@@ -150,16 +177,16 @@ const SignUpPage = () => {
                 type="checkbox"
                 checked={formData.agreeTerms}
                 onChange={(e) => handleChange("agreeTerms", e.target.checked)}
-                className={`mt-0.5 w-5 h-5 text-emerald-600 border-2 ${
+                className={`mt-0.5 w-5 h-5 text-primary-blue border-2 ${
                   errors.agreeTerms ? "border-red-400" : "border-gray-300"
-                } rounded focus:ring-2 focus:ring-emerald-500 cursor-pointer`}
+                } rounded focus:ring-2 focus:text-primary-blue-dark cursor-pointer`}
               />
               <span className="text-sm text-gray-600 group-hover:text-gray-900 leading-relaxed">
                 Tôi đồng ý với{" "}
                 <button
                   type="button"
                   onClick={() => console.log("Show terms")}
-                  className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline"
+                  className="text-primary-blue hover:text-primary-blue-light font-semibold hover:underline"
                 >
                   Điều khoản dịch vụ
                 </button>{" "}
@@ -167,7 +194,7 @@ const SignUpPage = () => {
                 <button
                   type="button"
                   onClick={() => console.log("Show privacy")}
-                  className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline"
+                  className="text-primary-blue hover:text-primary-blue-light font-semibold hover:underline"
                 >
                   Chính sách bảo mật
                 </button>

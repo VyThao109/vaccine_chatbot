@@ -44,7 +44,7 @@ export default function AuthInput({
           ${
             error
               ? "border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-              : "border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+              : "border-gray-200 focus:border-primary-blue-light focus:ring-4 focus:ring-blue-100"
           }`}
         />
       </div>

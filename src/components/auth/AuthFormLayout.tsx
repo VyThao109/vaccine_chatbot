@@ -24,9 +24,9 @@ export default function AuthFormLayout({
   return (
     <div className="flex-1 flex items-center justify-center p-6 md:p-8">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl border border-teal-100 overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
           {/* Header */}
-          <div className="bg-linear-to-br from-teal-500 to-cyan-600 p-8 text-center">
+          <div className="bg-gradient-background p-8 text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4">
               <LuShield className="w-10 h-10 text-white" />
             </div>
@@ -41,7 +41,7 @@ export default function AuthFormLayout({
             {/* Submit Button */}
             <button
               onClick={onSubmit}
-              className="w-full py-3.5 bg-linear-to-r from-teal-500 to-cyan-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-teal-200 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+              className="w-full py-3.5 bg-gradient-primary text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-teal-200 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
             >
               {submitText}
             </button>
@@ -52,7 +52,7 @@ export default function AuthFormLayout({
               <button
                 type="button"
                 onClick={onFooterClick}
-                className="text-sm font-semibold text-teal-600 hover:text-teal-700 hover:underline ml-1 cursor-pointer"
+                className="text-sm font-semibold text-primary-blue hover:text-primary-blue-light hover:underline ml-1 cursor-pointer"
               >
                 {footerLinkText}
               </button>

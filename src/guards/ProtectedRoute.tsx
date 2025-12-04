@@ -1,10 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { paths } from "../routes/paths";
+import useAuth from "../hooks/useAuth";
 
 const ProtectedRoute: React.FC = () => {
-  const storedEmail = localStorage.getItem("email");
-
-  const isAuth = Boolean(storedEmail);
+  const { isAuth } = useAuth();
 
   if (!isAuth) {
     return <Navigate to={paths.signin} replace />;

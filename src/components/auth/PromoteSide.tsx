@@ -2,7 +2,7 @@ import { LuLock, LuShield, LuSyringe } from "react-icons/lu";
 
 const PromoteSide = () => {
   return (
-    <div className="hidden lg:flex flex-1 bg-linear-to-br from-teal-600 via-cyan-600 to-blue-700 relative overflow-hidden">
+    <div className="hidden lg:flex flex-1 bg-gradient-background relative overflow-hidden">
       {/* Decorative circles */}
       <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>

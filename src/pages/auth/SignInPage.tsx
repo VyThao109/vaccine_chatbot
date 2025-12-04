@@ -3,9 +3,12 @@ import { useState } from "react";
 import { LuLock, LuMail } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../routes/paths";
-import AuthFormLayout from "../../compent/auth/AuthFormLayout";
-import AuthInput from "../../compent/auth/AuthInput";
-import PromoteSide from "../../compent/auth/PromoteSide";
+import AuthFormLayout from "../../components/auth/AuthFormLayout";
+import AuthInput from "../../components/auth/AuthInput";
+import PromoteSide from "../../components/auth/PromoteSide";
+import { useAppDispatch } from "../../redux/hook";
+import { useLoginMutation } from "../../redux/services/auth/auth.service";
+import { setCredentials } from "../../redux/features/auth/auth.slice";
 
 interface FormData {
   email: string;
@@ -21,6 +24,10 @@ interface FormErrors {
 
 const SignInPage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
+
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -54,10 +61,30 @@ const SignInPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (validateForm()) {
-      navigate(paths.chat);
+      try {
+        const response = await login({
+          email: formData.email,
+          password: formData.password,
+        }).unwrap();
+
+        if (response.statusCode === 200) {
+          dispatch(
+            setCredentials({
+              accessToken: response.data.token,
+            })
+          );
+          navigate(paths.chat);
+        } else {
+          alert(response.message || "Đăng nhập thất bại");
+        }
+      } catch (err: any) {
+        console.error("Login failed:", err);
+        const errorMsg = err?.data?.message || "Có lỗi xảy ra";
+        alert(errorMsg);
+      }
     }
   };
 
@@ -67,7 +94,7 @@ const SignInPage = () => {
       <AuthFormLayout
         title={"Chào mừng trở lại"}
         subtitle={"Đăng nhập vào tài khoản tư vấn vaccine của bạn"}
-        submitText="Đăng nhập"
+        submitText={isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
         onSubmit={handleSubmit}
         footerText={"Chưa có tài khoản"}
         footerLinkText={"Đăng ký ngay"}
@@ -103,7 +130,7 @@ const SignInPage = () => {
                 type="checkbox"
                 checked={formData.rememberMe}
                 onChange={(e) => handleChange("rememberMe", e.target.checked)}
-                className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-2 focus:ring-teal-500 cursor-pointer"
+                className="w-4 h-4 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
               />
               <span className="text-sm text-gray-600 group-hover:text-gray-900">
                 Ghi nhớ đăng nhập
@@ -112,7 +139,7 @@ const SignInPage = () => {
             <button
               type="button"
               onClick={() => console.log("Forgot password")}
-              className="text-sm font-medium text-teal-600 hover:text-teal-700 hover:underline cursor-pointer"
+              className="text-sm font-medium text-primary-blue hover:text-primary-blue-light hover:underline cursor-pointer"
             >
               Quên mật khẩu?
             </button>
