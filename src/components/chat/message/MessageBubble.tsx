@@ -1,5 +1,6 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import type { IMessageResponseData } from "../../../interfaces/chat.interface";
 import { formatMessageTime } from "../../../utils/dateUtils";
 import { useState } from "react";
@@ -19,6 +20,15 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
     !isBot &&
     (message.msgContent.length > 300 ||
       (message.msgContent.match(/\n/g) || []).length > 5);
+
+  const formatContent = (content: string) => {
+    if (!content && isBot)
+      return "Xin lỗi, hiện tại tôi chưa thể đưa ra câu trả lời cho nội dung này. Bạn vui lòng thử lại hoặc đặt câu hỏi khác nhé!";
+
+    return content.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+  };
+
+  const processedContent = formatContent(message.msgContent);
 
   return (
     <div className={`flex ${isBot ? "justify-start" : "justify-end"}`}>
@@ -40,12 +50,12 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
             }`}
           >
             {isBot ? (
-              <div className="prose prose-sm max-w-none">
+              <div className="prose prose-sm max-w-none mt-2">
                 <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
+                  remarkPlugins={[remarkGfm, remarkBreaks]}
                   components={{
                     p: ({ children }) => (
-                      <p className="mb-2 last:mb-0 wrap-break-word">
+                      <p className="mb-2 last:mb-0 wrap-break-word text-justify hyphens-auto">
                         {children}
                       </p>
                     ),
@@ -56,12 +66,12 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
                       <em className="italic">{children}</em>
                     ),
                     code: ({ children }) => (
-                      <code className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-mono break-all inline-block max-w-full">
+                      <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs font-mono break-all inline-block max-w-full">
                         {children}
                       </code>
                     ),
                     pre: ({ children }) => (
-                      <pre className="bg-blue-500 text-white p-3 rounded-lg overflow-x-auto my-2 max-w-full">
+                      <pre className="bg-gray-800 text-white p-3 rounded-lg overflow-x-auto my-2 max-w-full">
                         <code className="block whitespace-pre-wrap wrap-break-word text-xs font-mono">
                           {children}
                         </code>
@@ -88,7 +98,7 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
                     ),
                   }}
                 >
-                  {message.msgContent}
+                  {processedContent}
                 </ReactMarkdown>
               </div>
             ) : (

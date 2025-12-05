@@ -118,7 +118,7 @@ const SideBar = ({
 
       {/* Conversations List */}
       <div
-        className={`flex-1 overflow-y-auto p-4 space-y-2 transition-opacity ${
+        className={`flex-1 overflow-y-auto p-4 space-y-2 transition-opacity custom-scrollbar ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onScroll={handleScroll}
@@ -126,8 +126,8 @@ const SideBar = ({
         {isLoading && isOpen && (
           <div className="space-y-3 p-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse flex gap-3">
-                <div className="h-10 w-full bg-gray-200 rounded-md"></div>
+              <div key={i} className="animate-pulse flex gap-2">
+                <div className="h-10 w-full bg-gray-200 rounded-full"></div>
               </div>
             ))}
           </div>

@@ -101,29 +101,44 @@
 /* Border Utilities */
 .border-primary { border-color: var(--color-primary-teal); }
 
-/* *::-webkit-scrollbar {
-  display: none;
-} */
-
-* {
-  -ms-overflow-style: none;
-  /* IE & Edge */
-  scrollbar-width: none;
-  /* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #cbd5e1 transparent; /* Firefox: thumb track */
 }
 
+/* Webkit browsers (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;  /* Chiều rộng thanh scroll dọc */
+  height: 6px; /* Chiều cao thanh scroll ngang */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; 
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8; /* Slate 400 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-button:single-button,
+.custom-scrollbar::-webkit-scrollbar-button:vertical:decrement,
+.custom-scrollbar::-webkit-scrollbar-button:vertical:increment,
+.custom-scrollbar::-webkit-scrollbar-button:horizontal:decrement,
+.custom-scrollbar::-webkit-scrollbar-button:horizontal:increment,
+.custom-scrollbar::-webkit-scrollbar-button:start:decrement,
+.custom-scrollbar::-webkit-scrollbar-button:end:increment {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    background-color: transparent;
+}
 body {
   overflow: auto;
-}
-
-.scrollbar-visible::-webkit-scrollbar {
-  display: block !important;
-  height: 8px;
-}
-
-.scrollbar-visible {
-  scrollbar-width: thin;
-  /* Firefox */
-  -ms-overflow-style: auto;
-  /* IE/Edge */
 }

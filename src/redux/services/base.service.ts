@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { signOut } from "../features/auth/auth.slice";
 import type { RootState } from "../store";
-const BASE_URL = "https://localhost:7032/api";
+import { BASE_API_URL } from "../../utils/constants/globalContants";
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: BASE_URL,
+    baseUrl: BASE_API_URL,
     mode: "cors",
     prepareHeaders: (headers, {getState}) => {
         const token = (getState() as RootState).auth.accessToken;

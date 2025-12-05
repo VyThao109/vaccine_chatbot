@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SideBar from "../../components/chat/sidebar/SideBar";
 import MessagesArea from "../../components/chat/message/MessagesArea";
 import MessageInput from "../../components/chat/message/MessageInput";
@@ -9,16 +9,21 @@ import {
   useGetChatSessionsQuery,
   useGetSessionHistoryQuery,
 } from "../../redux/services/chat/chat.service";
-import type {
-  IChatSessionResponseData,
-  IMessageResponseData,
-} from "../../interfaces/chat.interface";
+import type { IMessageResponseData } from "../../interfaces/chat.interface";
 import { LuTrash2, LuX } from "react-icons/lu";
 
 const ChatPage = () => {
   const { data: sessionData, isLoading: isSessionLoading } =
     useGetChatSessionsQuery();
-  const chatSessions: IChatSessionResponseData[] = sessionData?.data || [];
+  const chatSessions = useMemo(() => {
+    if (!sessionData?.data) return [];
+
+    return [...sessionData.data].sort((a, b) => {
+      return (
+        new Date(b.updatedDate).getTime() - new Date(a.updatedDate).getTime()
+      );
+    });
+  }, [sessionData]);
 
   const [askChatbot, { isLoading: isSending }] = useAskChatbotMutation();
 
