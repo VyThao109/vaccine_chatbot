@@ -7,11 +7,12 @@ const baseQuery = fetchBaseQuery({
     baseUrl: BASE_API_URL,
     mode: "cors",
     prepareHeaders: (headers, {getState}) => {
-        const token = (getState() as RootState).auth.accessToken;
-        if (token) {
-            headers.set("Authorization", `Bearer ${token}`)
-        }
-        return headers;
+      headers.set('ngrok-skip-browser-warning', 'true');
+      const token = (getState() as RootState).auth.accessToken;
+      if (token) {
+          headers.set("Authorization", `Bearer ${token}`)
+      }
+      return headers;
     }
 });
 
