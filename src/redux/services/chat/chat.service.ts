@@ -15,7 +15,7 @@ export const chatApi = apiSlice.injectEndpoints({
                 url: `/Chat/History/${idSession}`,
                 method: "GET",
             }),
-            providesTags: (result, error, idSession) => [{ type: "Chat", id: idSession }],
+            providesTags: (_result, _error, idSession) => [{ type: "Chat", id: idSession }],
         }),
         deleteChatSession: builders.mutation<void, string>({
             query: (idSession) => ({
