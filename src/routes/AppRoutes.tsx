@@ -6,6 +6,7 @@ import SignUpPage from "../pages/auth/SignUpPage";
 import NotFoundPage from "../pages/error/NotFoundPage";
 import ProtectedRoute from "../guards/ProtectedRoute";
 import ChatPage from "../pages/chat/ChatPage";
+import ForbiddenPage from "../pages/auth/ForbiddenPage";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
       </Route>
       <Route path={paths.signin} element={<SignInPage />} />
       <Route path={paths.signup} element={<SignUpPage />} />
+      <Route path={paths.forbidden} element={<ForbiddenPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

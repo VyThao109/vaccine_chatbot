@@ -19,14 +19,16 @@ const MessagesArea = ({ messages, isLoading }: MessagesAreaProps) => {
     scrollToBottom();
   }, [messages, isLoading]);
   return (
-    <div className="w-4/5 md:w-2/3 flex-1 overflow-y-auto pt-6 pb-2 space-y-4">
-      {messages.map((msg) => (
-        <MessageBubble key={msg.idChatMessage} message={msg} />
-      ))}
+    <div className="w-full flex-1 flex justify-center overflow-y-auto pt-6 pb-2 space-y-4 custom-scrollbar">
+      <div className="w-4/5 md:w-2/3">
+        {messages.map((msg) => (
+          <MessageBubble key={msg.idChatMessage} message={msg} />
+        ))}
 
-      {isLoading && <LoadingIndicator />}
+        {isLoading && <LoadingIndicator />}
 
-      <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} />
+      </div>
     </div>
   );
 };

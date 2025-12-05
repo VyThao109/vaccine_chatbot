@@ -4,6 +4,7 @@ export interface IChatSessionResponseData{
     idChatSession: string;
     title: string;
     createdDate: string;
+    updatedDate: string;
 };
 
 export type IChatSessionResponse = IBaseResponse<IChatSessionResponseData[]>;
