@@ -22,7 +22,7 @@ export default function AuthInput({
   error,
 }: AuthInputProps) {
   return (
-    <div>
+    <div className="text-left">
       <label className="block text-sm font-semibold text-gray-700 mb-2">
         {label}
       </label>
@@ -38,13 +38,13 @@ export default function AuthInput({
           value={value}
           onChange={onChange}
           required={required}
-          className={`w-full py-3.5 pr-4 bg-gray-50 border-2 rounded-2xl text-gray-900
+          className={`w-full py-3 pr-4 bg-gray-50 border-2 rounded-2xl text-gray-900
           placeholder-gray-400 focus:outline-none focus:bg-white transition-all duration-200
           ${icon ? "pl-12" : "pl-4"}
           ${
             error
-              ? "border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-              : "border-gray-200 focus:border-primary-blue-light focus:ring-4 focus:ring-blue-100"
+              ? "border-red-400 focus:border-red-500"
+              : "border-gray-200 focus:border-gray-300"
           }`}
         />
       </div>

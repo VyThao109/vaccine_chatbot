@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import { LuLogOut } from "react-icons/lu";
-import { useNavigate } from "react-router-dom";
-import { paths } from "../../../routes/paths";
-import { useAppDispatch } from "../../../redux/hook";
-import { signOut } from "../../../redux/features/auth/auth.slice";
+import { LuLock, LuLogOut } from "react-icons/lu";
 import { useGetUserProfileQuery } from "../../../redux/services/user/user.service";
 
 export interface UserProfile {
@@ -15,12 +11,15 @@ export interface UserProfile {
 
 interface UserMenuProps {
   isSidebarOpen: boolean;
+  onChangePasswordClick: () => void;
+  onLogoutClick: () => void;
 }
 
-const UserMenu = ({ isSidebarOpen }: UserMenuProps) => {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
+const UserMenu = ({
+  isSidebarOpen,
+  onChangePasswordClick,
+  onLogoutClick,
+}: UserMenuProps) => {
   const { data: profileResponse, isLoading } = useGetUserProfileQuery();
 
   const user = profileResponse?.data;
@@ -56,10 +55,12 @@ const UserMenu = ({ isSidebarOpen }: UserMenuProps) => {
       .slice(0, 2);
   };
 
-  const handleSignout = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleChangePasswordClick = (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
     e.preventDefault();
-    dispatch(signOut());
-    navigate(paths.signin);
+    setIsOpen(false);
+    onChangePasswordClick();
   };
 
   return (
@@ -114,10 +115,17 @@ const UserMenu = ({ isSidebarOpen }: UserMenuProps) => {
               </div>
             </div>
           </div>
+          <button
+            onClick={handleChangePasswordClick}
+            className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 flex items-center gap-3 text-gray-500 border-t-2 border-gray-100 cursor-pointer"
+          >
+            <LuLock className="w-5 h-5" />
+            <span className="text-sm font-medium">Thay đổi mật khẩu</span>
+          </button>
 
           <button
-            onClick={handleSignout}
-            className="w-full px-4 py-3 text-left hover:bg-red-50 transition-colors duration-200 flex items-center gap-3 text-gray-500 border-t-2 border-gray-100 cursor-pointer"
+            onClick={onLogoutClick}
+            className="w-full px-4 py-3 text-left hover:bg-red-50 transition-colors duration-200 flex items-center gap-3 text-text-error border-t-2 border-gray-100 cursor-pointer"
           >
             <LuLogOut className="w-5 h-5" />
             <span className="text-sm font-medium">Đăng xuất</span>

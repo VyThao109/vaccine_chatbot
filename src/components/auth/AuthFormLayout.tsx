@@ -1,4 +1,5 @@
 import { LuShield } from "react-icons/lu";
+import GradientButton from "../common/GradientButton";
 
 interface AuthFormLayoutProps {
   title: string;
@@ -39,12 +40,7 @@ export default function AuthFormLayout({
             {children}
 
             {/* Submit Button */}
-            <button
-              onClick={onSubmit}
-              className="w-full py-3.5 bg-gradient-primary text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-teal-200 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
-            >
-              {submitText}
-            </button>
+            <GradientButton onClick={onSubmit}>{submitText}</GradientButton>
 
             {/* Footer */}
             <div className="text-center pt-4">

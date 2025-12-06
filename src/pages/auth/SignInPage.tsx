@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { LuLock, LuMail } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
@@ -7,8 +7,14 @@ import AuthFormLayout from "../../components/auth/AuthFormLayout";
 import AuthInput from "../../components/auth/AuthInput";
 import PromoteSide from "../../components/auth/PromoteSide";
 import { useAppDispatch } from "../../redux/hook";
-import { useLoginMutation } from "../../redux/services/auth/auth.service";
+import {
+  useForgotPassMutation,
+  useLoginMutation,
+} from "../../redux/services/auth/auth.service";
 import { setCredentials } from "../../redux/features/auth/auth.slice";
+import GradientButton from "../../components/common/GradientButton";
+import { useToast } from "../../hooks/useToast";
+import DialogLayout from "../../components/common/DialogLayout";
 
 interface FormData {
   email: string;
@@ -25,8 +31,10 @@ interface FormErrors {
 const SignInPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { showToast } = useToast();
 
   const [login, { isLoading }] = useLoginMutation();
+  const [forgotPass, { isLoading: isForgotLoading }] = useForgotPassMutation();
 
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -36,9 +44,12 @@ const SignInPage = () => {
 
   const [errors, setErrors] = useState<FormErrors>({});
 
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotError, setForgotError] = useState("");
+
   const handleChange = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -78,13 +89,50 @@ const SignInPage = () => {
           );
           navigate(paths.chat);
         } else {
-          alert(response.message || "Đăng nhập thất bại");
+          showToast(response.message || "Đăng nhập thất bại", "error");
         }
       } catch (err: any) {
         console.error("Login failed:", err);
-        const errorMsg = err?.data?.message || "Có lỗi xảy ra";
-        alert(errorMsg);
+
+        if (err.status === 400 && err.data.data === "User was not found.") {
+          showToast("Email hoặc mật khẩu bạn nhập chưa chính xác.", "error");
+        } else {
+          const errorMsg = err?.data?.message || "Có lỗi xảy ra";
+          showToast(errorMsg, "error");
+        }
       }
+    }
+  };
+
+  useEffect(() => {
+    setForgotEmail("");
+    setForgotError("");
+  }, [isForgotPasswordOpen]);
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError("");
+
+    if (!forgotEmail.trim()) {
+      setForgotEmail("Vui lòng nhập email để khôi phục mật khẩu");
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(forgotEmail)) {
+      setForgotError("Email không đúng định dạng");
+      return;
+    }
+
+    try {
+      await forgotPass({ email: forgotEmail }).unwrap();
+      setIsForgotPasswordOpen(false);
+      setForgotEmail("");
+      showToast("Đã gửi mật khẩu mới về email của bạn!", "success", 5000);
+    } catch (err: any) {
+      console.error("Forgot password failed:", err);
+      const errorMsg =
+        err?.data?.message || "Không thể gửi yêu cầu. Vui lòng thử lại.";
+      setForgotError(errorMsg);
     }
   };
 
@@ -124,8 +172,8 @@ const SignInPage = () => {
           />
 
           {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer group">
+          <div className="flex items-center justify-end">
+            {/* <label className="flex items-center gap-2 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.rememberMe}
@@ -135,10 +183,10 @@ const SignInPage = () => {
               <span className="text-sm text-gray-600 group-hover:text-gray-900">
                 Ghi nhớ đăng nhập
               </span>
-            </label>
+            </label> */}
             <button
               type="button"
-              onClick={() => console.log("Forgot password")}
+              onClick={() => setIsForgotPasswordOpen(true)}
               className="text-sm font-medium text-primary-blue hover:text-primary-blue-light hover:underline cursor-pointer"
             >
               Quên mật khẩu?
@@ -149,6 +197,49 @@ const SignInPage = () => {
 
       {/* Right Side - Visual (Hidden on mobile) */}
       <PromoteSide />
+
+      <DialogLayout
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        type="info"
+        icon={<LuLock />}
+        title="Khôi phục mật khẩu"
+        subtitle="Nhập email của bạn và chúng tôi sẽ gửi cho bạn một mật khẩu mới."
+      >
+        <form onSubmit={handleForgotPasswordSubmit} className="space-y-6">
+          <AuthInput
+            label={"Email đăng ký"}
+            type="email"
+            placeholder={"example@gmail.com"}
+            value={forgotEmail}
+            onChange={(e) => {
+              setForgotEmail(e.target.value);
+              if (forgotError) setForgotError("");
+            }}
+            icon={<LuMail className="w-5 h-5" />}
+            error={forgotError}
+          />
+          <div className="space-y-3">
+            <GradientButton
+              type="submit"
+              isLoading={isForgotLoading}
+              className="mt-2"
+            >
+              {isForgotLoading ? "Đang gửi..." : "Gửi yêu cầu"}
+            </GradientButton>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsForgotPasswordOpen(false)}
+                className="text-sm font-medium text-gray-500 hover:text-gray-900 cursor-pointer"
+              >
+                Quay lại đăng nhập
+              </button>
+            </div>
+          </div>
+        </form>
+      </DialogLayout>
     </div>
   );
 };

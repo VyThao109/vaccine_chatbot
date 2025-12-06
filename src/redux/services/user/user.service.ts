@@ -1,4 +1,4 @@
-import type { IUserProfileResponse } from "../../../interfaces/user.interface";
+import type { IChangePassRequest, IUserProfileResponse } from "../../../interfaces/user.interface";
 import { apiSlice } from "../base.service";
 
 export const userApi = apiSlice.injectEndpoints({
@@ -9,8 +9,15 @@ export const userApi = apiSlice.injectEndpoints({
                 method: "GET"
             }),
             providesTags: ["User"]
+        }),
+        changePassword: builders.mutation<void, IChangePassRequest>({
+            query: (credentials) => ({
+                url: "/User/ChangePassword",
+                method: "POST",
+                body: credentials
+            }),
         })
     })
 })
 
-export const { useGetUserProfileQuery } = userApi;
+export const { useGetUserProfileQuery, useChangePasswordMutation } = userApi;
