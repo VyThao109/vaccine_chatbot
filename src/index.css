@@ -71,9 +71,10 @@
   --color-info-light: #DBEAFE;          /* Blue 100 - Info backgrounds */
   --color-info-dark: #2563EB;           /* Blue 600 - Info emphasis */
 
-  --gradient-primary: linear-gradient(135deg, #0D74B1 0%, #0099CF 100%);
+  --gradient-primary: linear-gradient(135deg, #0D74B1 50%, #0099CF 100%);
   --gradient-background: linear-gradient(135deg, #0D74B1 0%, #0099CF 50%, #1040C5 100%);
   --gradient-dark: linear-gradient(135deg, #1040C5 0%, #101732 100%);
+  --gradient-red: linear-gradient(135deg, #DC2626 0%, rgb(156, 40, 40) 100%);
 
   --font-primary: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
@@ -91,6 +92,7 @@
 .bg-gradient-primary { background: var(--gradient-primary); }
 .bg-gradient-background { background: var(--gradient-background); }
 .bg-gradient-dark {background: var(--gradient-dark);}
+.bg-gradient-red {background: var(--gradient-red);}
 
 /* Text Color Utilities */
 .text-primary { color: var(--color-primary-teal); }

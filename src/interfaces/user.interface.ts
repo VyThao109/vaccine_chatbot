@@ -6,4 +6,9 @@ export interface IUserProfileResponseData {
     email: string;
 }
 
+export interface IChangePassRequest {
+    oldPassword: string;
+    newPassword: string;
+}
+
 export type IUserProfileResponse = IBaseResponse<IUserProfileResponseData>;

@@ -11,6 +11,10 @@ export interface IRegisterRequest {
     password: string
 }
 
+export interface IForgotPassRequest {
+    email: string
+}
+
 export interface IAuthResponseData {
     token: string;
 }

@@ -14,6 +14,8 @@ interface SideBarProps {
   onToggle: () => void;
   isLoading?: boolean;
   onDeleteChatSession: (id: string) => void;
+  onChangePasswordClick: () => void;
+  onLogoutClick: () => void;
 }
 
 const SideBar = ({
@@ -25,6 +27,8 @@ const SideBar = ({
   onToggle,
   isLoading = false,
   onDeleteChatSession,
+  onChangePasswordClick,
+  onLogoutClick,
 }: SideBarProps) => {
   // State lưu ID của session đang mở menu options
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -158,7 +162,7 @@ const SideBar = ({
                 </div>
 
                 <button
-                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
                     openMenuId === session.idChatSession
                       ? "bg-gray-200 text-gray-800"
                       : "bg-transparent hover:bg-black/5 text-gray-400"
@@ -199,7 +203,11 @@ const SideBar = ({
         </div>
       </div>
 
-      <UserMenu isSidebarOpen={isOpen} />
+      <UserMenu
+        isSidebarOpen={isOpen}
+        onChangePasswordClick={onChangePasswordClick}
+        onLogoutClick={onLogoutClick}
+      />
     </div>
   );
 };

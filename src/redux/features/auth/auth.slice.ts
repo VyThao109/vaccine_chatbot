@@ -23,7 +23,8 @@ const authSlice = createSlice({
         signOut: (state) => {
             state.accessToken = null;
             state.isAuthenticated = false;
-            localStorage.removeItem("authToken");
+            localStorage.clear();
+            sessionStorage.clear();
         }
     }
 });

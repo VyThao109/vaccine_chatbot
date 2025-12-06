@@ -8,6 +8,7 @@ import PromoteSide from "../../components/auth/PromoteSide";
 import { useAppDispatch } from "../../redux/hook";
 import { useRegisterMutation } from "../../redux/services/auth/auth.service";
 import { setCredentials } from "../../redux/features/auth/auth.slice";
+import { useToast } from "../../hooks/useToast";
 
 interface FormData {
   fullName: string;
@@ -29,6 +30,7 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [register, { isLoading }] = useRegisterMutation();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
@@ -98,14 +100,19 @@ const SignUpPage = () => {
               accessToken: response.data.token,
             })
           );
+          showToast("Tạo tài khoản thành công!", "success", 5000);
           navigate(paths.chat);
         } else {
-          alert(response.message || "Đăng ký thất bại");
+          showToast(response.message || "Đăng ký thất bại.", "error");
         }
       } catch (err: any) {
         console.error("Register failed:", err);
-        const errorMsg = err?.data?.message || "Có lỗi xảy ra";
-        alert(errorMsg);
+        if (err.status === 400 && err.data.data === "Email already exists.") {
+          showToast("Email này đã được đăng ký trên hệ thống.", "error");
+        } else {
+          const errorMsg = err?.data?.message || "Có lỗi xảy ra";
+          showToast(errorMsg, "error");
+        }
       }
     }
   };

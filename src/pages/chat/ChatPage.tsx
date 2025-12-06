@@ -10,9 +10,23 @@ import {
   useGetSessionHistoryQuery,
 } from "../../redux/services/chat/chat.service";
 import type { IMessageResponseData } from "../../interfaces/chat.interface";
-import { LuTrash2, LuX } from "react-icons/lu";
+import { LuLock, LuLogOut, LuTrash2 } from "react-icons/lu";
+import { useToast } from "../../hooks/useToast";
+import AuthInput from "../../components/auth/AuthInput";
+import GradientButton from "../../components/common/GradientButton";
+import { useChangePasswordMutation } from "../../redux/services/user/user.service";
+import DialogLayout from "../../components/common/DialogLayout";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../redux/hook";
+import { signOut } from "../../redux/features/auth/auth.slice";
+import { paths } from "../../routes/paths";
+import { apiSlice } from "../../redux/services/base.service";
 
 const ChatPage = () => {
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const { data: sessionData, isLoading: isSessionLoading } =
     useGetChatSessionsQuery();
   const chatSessions = useMemo(() => {
@@ -96,29 +110,6 @@ const ChatPage = () => {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
   };
 
-  const handleRequestDelete = (id: string) => {
-    setSessionToDeleteId(id); // Mở dialog
-  };
-
-  const confirmDelete = async () => {
-    if (sessionToDeleteId) {
-      try {
-        await deleteChatSession(sessionToDeleteId).unwrap();
-        if (sessionToDeleteId === activeChatSessionId) {
-          handleNewChat();
-        }
-      } catch (error) {
-        console.error("Failed to delete session:", error);
-      } finally {
-        setSessionToDeleteId(null); // Đóng dialog
-      }
-    }
-  };
-
-  const cancelDelete = () => {
-    setSessionToDeleteId(null); // Đóng dialog
-  };
-
   const handleSendMessage = async (): Promise<void> => {
     if (!message.trim() || isSending) return;
 
@@ -169,6 +160,109 @@ const ChatPage = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  //Delete session
+  const handleRequestDelete = (id: string) => {
+    setSessionToDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (sessionToDeleteId) {
+      try {
+        await deleteChatSession(sessionToDeleteId).unwrap();
+        if (sessionToDeleteId === activeChatSessionId) {
+          handleNewChat();
+        }
+      } catch (error) {
+        console.error("Failed to delete session:", error);
+      } finally {
+        setSessionToDeleteId(null);
+      }
+    }
+  };
+
+  const cancelDelete = () => {
+    setSessionToDeleteId(null);
+  };
+
+  //Change Password
+  const [changePassword, { isLoading: isChangingPass }] =
+    useChangePasswordMutation();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [changePassData, setChangePassData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  useEffect(() => {
+    setChangePassData({
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  }, [isChangePasswordOpen]);
+
+  const handleChangePassInput = (field: string, value: string) => {
+    setChangePassData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmitChangePass = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (
+      !changePassData.oldPassword ||
+      !changePassData.newPassword ||
+      !changePassData.confirmPassword
+    ) {
+      showToast("Vui lòng điền đầy đủ thông tin", "error");
+      return;
+    }
+
+    if (changePassData.newPassword !== changePassData.confirmPassword) {
+      showToast("Mật khẩu xác nhận không khớp", "error");
+      return;
+    }
+
+    if (changePassData.newPassword.length < 6) {
+      showToast("Mật khẩu mới phải có ít nhất 6 ký tự", "error");
+      return;
+    }
+
+    try {
+      await changePassword({
+        oldPassword: changePassData.oldPassword,
+        newPassword: changePassData.newPassword,
+      }).unwrap();
+
+      showToast("Đổi mật khẩu thành công!", "success");
+      setIsChangePasswordOpen(false);
+      setChangePassData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err: any) {
+      console.error("Change pass failed:", err);
+      if (
+        err.status === 400 &&
+        err.data.data.message === "Old password is incorrect."
+      ) {
+        showToast("Mật khẩu hiện tại không chính xác.", "error");
+      } else {
+        showToast(err?.data?.message || "Đổi mật khẩu thất bại", "error");
+      }
+    }
+  };
+
+  //Log out
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const handleSignout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    dispatch(signOut());
+    dispatch(apiSlice.util.resetApiState());
+    navigate(paths.signin);
+  };
+
   return (
     <div className="h-screen w-full flex relative overflow-hidden">
       {isSidebarOpen && (
@@ -200,6 +294,8 @@ const ChatPage = () => {
           onToggle={toggleSidebar}
           isLoading={isSessionLoading}
           onDeleteChatSession={handleRequestDelete}
+          onChangePasswordClick={() => setIsChangePasswordOpen(true)}
+          onLogoutClick={() => setIsLogoutDialogOpen(true)}
         />
       </div>
       <div className="flex-1 flex flex-col items-center border-l border-gray-300 w-full md:w-auto min-w-0 bg-white">
@@ -248,48 +344,107 @@ const ChatPage = () => {
           </>
         )}
       </div>
-      {sessionToDeleteId && (
-        <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+
+      {/* Delete session */}
+      <DialogLayout
+        isOpen={!!sessionToDeleteId}
+        onClose={cancelDelete}
+        type="error"
+        icon={<LuTrash2 />}
+        title="Xóa cuộc trò chuyện?"
+        subtitle="Bạn có chắc chắn muốn xóa cuộc trò chuyện này không? Hành động này không thể hoàn tác."
+        maxWidth="max-w-sm"
+      >
+        <div className="flex gap-3 w-full">
+          <button
             onClick={cancelDelete}
-          />
-          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all scale-100 animate-in fade-in zoom-in duration-200">
-            <button
-              onClick={cancelDelete}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 cursor-pointer"
-            >
-              <LuX className="w-5 h-5" />
-            </button>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <LuTrash2 className="w-6 h-6 text-text-error" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Xóa cuộc trò chuyện?
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                Bạn có chắc chắn muốn xóa cuộc trò chuyện này không? Hành động
-                này không thể hoàn tác.
-              </p>
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={cancelDelete}
-                  className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors cursor-pointer"
-                >
-                  Hủy
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  className="flex-1 px-4 py-2 bg-error hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-sm cursor-pointer"
-                >
-                  Xóa
-                </button>
-              </div>
-            </div>
-          </div>
+            className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors cursor-pointer"
+          >
+            Hủy
+          </button>
+          <button
+            onClick={confirmDelete}
+            className="flex-1 px-4 py-2 bg-gradient-red text-white font-medium rounded-lg transition-colors shadow-sm cursor-pointer"
+          >
+            Xóa
+          </button>
         </div>
-      )}
+      </DialogLayout>
+
+      {/* Change password */}
+      <DialogLayout
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        type="info"
+        icon={<LuLock />}
+        title="Thay đổi mật khẩu"
+        subtitle="Để bảo mật, vui lòng nhập mật khẩu cũ của bạn."
+      >
+        <form onSubmit={handleSubmitChangePass} className="space-y-4 text-left">
+          <AuthInput
+            label="Mật khẩu hiện tại"
+            type="password"
+            placeholder="••••••••"
+            value={changePassData.oldPassword}
+            onChange={(e) =>
+              handleChangePassInput("oldPassword", e.target.value)
+            }
+            icon={<LuLock className="w-5 h-5" />}
+          />
+          <div className="border-t border-gray-100 my-2"></div>
+          <AuthInput
+            label="Mật khẩu mới"
+            type="password"
+            placeholder="••••••••"
+            value={changePassData.newPassword}
+            onChange={(e) =>
+              handleChangePassInput("newPassword", e.target.value)
+            }
+            icon={<LuLock className="w-5 h-5" />}
+          />
+          <AuthInput
+            label="Xác nhận mật khẩu mới"
+            type="password"
+            placeholder="••••••••"
+            value={changePassData.confirmPassword}
+            onChange={(e) =>
+              handleChangePassInput("confirmPassword", e.target.value)
+            }
+            icon={<LuLock className="w-5 h-5" />}
+          />
+          <div className="pt-2">
+            <GradientButton type="submit" isLoading={isChangingPass}>
+              {isChangingPass ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+            </GradientButton>
+          </div>
+        </form>
+      </DialogLayout>
+
+      {/* Logout */}
+      <DialogLayout
+        isOpen={isLogoutDialogOpen}
+        onClose={() => setIsLogoutDialogOpen(false)}
+        type="error"
+        icon={<LuLogOut />}
+        title="Đăng xuất?"
+        subtitle="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?"
+        maxWidth="max-w-sm"
+      >
+        <div className="flex gap-3 w-full">
+          <button
+            onClick={() => setIsLogoutDialogOpen(false)}
+            className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors cursor-pointer"
+          >
+            Hủy
+          </button>
+          <button
+            onClick={handleSignout}
+            className="flex-1 px-4 py-2 bg-gradient-red text-white font-medium rounded-lg transition-colors shadow-sm cursor-pointer"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </DialogLayout>
     </div>
   );
 };
