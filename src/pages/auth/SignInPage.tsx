@@ -130,8 +130,17 @@ const SignInPage = () => {
       showToast("Đã gửi mật khẩu mới về email của bạn!", "success", 5000);
     } catch (err: any) {
       console.error("Forgot password failed:", err);
+      if (
+        err.status === 400 &&
+        err.data.data === "Email không tồn tại trong hệ thống."
+      ) {
+        showToast("Email bạn nhập không tồn tại trong hệ thống.", "error");
+      } else {
+        const errorMsg = err?.data?.message || "Có lỗi xảy ra";
+        showToast(errorMsg, "error");
+      }
       const errorMsg =
-        err?.data?.message || "Không thể gửi yêu cầu. Vui lòng thử lại.";
+        err?.data?.data || "Không thể gửi yêu cầu. Vui lòng thử lại.";
       setForgotError(errorMsg);
     }
   };
@@ -206,7 +215,11 @@ const SignInPage = () => {
         title="Khôi phục mật khẩu"
         subtitle="Nhập email của bạn và chúng tôi sẽ gửi cho bạn một mật khẩu mới."
       >
-        <form onSubmit={handleForgotPasswordSubmit} className="space-y-6">
+        <form
+          onSubmit={handleForgotPasswordSubmit}
+          className="space-y-6"
+          noValidate
+        >
           <AuthInput
             label={"Email đăng ký"}
             type="email"

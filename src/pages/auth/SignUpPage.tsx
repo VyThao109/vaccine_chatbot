@@ -15,7 +15,6 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-  agreeTerms: boolean;
 }
 
 interface FormErrors {
@@ -23,7 +22,6 @@ interface FormErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
-  agreeTerms?: string;
 }
 
 const SignUpPage = () => {
@@ -37,7 +35,6 @@ const SignUpPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    agreeTerms: false,
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -75,9 +72,9 @@ const SignUpPage = () => {
       newErrors.confirmPassword = "Mật khẩu không khớp";
     }
 
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "Bạn phải đồng ý với điều khoản";
-    }
+    // if (!formData.agreeTerms) {
+    //   newErrors.agreeTerms = "Bạn phải đồng ý với điều khoản";
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -118,7 +115,7 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-linear-to-br from-teal-50 via-cyan-50 to-blue-50 custom-scrollbar">
+    <div className="min-h-screen w-full flex bg-linear-to-br from-teal-50 via-cyan-50 to-blue-50 overflow-y-auto custom-scrollbar">
       {/* Left Side */}
       <PromoteSide />
 
@@ -178,7 +175,7 @@ const SignUpPage = () => {
           />
 
           {/* Term Agreement */}
-          <div>
+          {/* <div>
             <label className="flex items-start gap-3 cursor-pointer group">
               <input
                 type="checkbox"
@@ -210,7 +207,7 @@ const SignUpPage = () => {
             {errors.agreeTerms && (
               <p className="mt-1.5 text-sm text-red-600">{errors.agreeTerms}</p>
             )}
-          </div>
+          </div> */}
         </div>
       </AuthFormLayout>
     </div>
