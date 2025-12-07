@@ -118,7 +118,7 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-linear-to-br from-teal-50 via-cyan-50 to-blue-50">
+    <div className="min-h-screen w-full flex bg-linear-to-br from-teal-50 via-cyan-50 to-blue-50 custom-scrollbar">
       {/* Left Side */}
       <PromoteSide />
 
