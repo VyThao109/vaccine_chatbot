@@ -69,7 +69,7 @@ Dự án được xây dựng dựa trên **React + TypeScript + Vite**.
 
 1. **Clone dự án**
    ```bash
-   git clone [https://github.com/your-username/vaxbot.git](https://github.com/your-username/vaxbot.git)
+   git clone [https://github.com/VyThao109/vaccine_chatbot.git]
    cd vaxbot
    ```
 2. **Cài đặt dependencies**
