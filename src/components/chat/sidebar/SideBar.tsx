@@ -59,7 +59,7 @@ const SideBar = ({
     <div
       className={`${
         isOpen ? "w-full lg:w-80" : "w-20"
-      } bg-white transition-all duration-300 flex flex-col overflow-hidden h-screen relative border-r border-gray-200`}
+      } bg-white transition-all duration-300 flex flex-col overflow-hidden h-screen supports-[height:100dvh]:h-dvh relative border-r border-gray-200`}
       onClick={() => {
         if (!isOpen) onToggle();
       }}
@@ -203,11 +203,13 @@ const SideBar = ({
         </div>
       </div>
 
-      <UserMenu
-        isSidebarOpen={isOpen}
-        onChangePasswordClick={onChangePasswordClick}
-        onLogoutClick={onLogoutClick}
-      />
+      <div className="shrink-0 pb-[env(safe-area-inset-bottom)]">
+        <UserMenu
+          isSidebarOpen={isOpen}
+          onChangePasswordClick={onChangePasswordClick}
+          onLogoutClick={onLogoutClick}
+        />
+      </div>
     </div>
   );
 };
